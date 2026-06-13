@@ -6,6 +6,7 @@ import {
   createRecipe,
   updateRecipe,
   softDeleteRecipe,
+  softDeleteRecipes,
   restoreRecipe,
   permanentDeleteRecipe,
   getRecipeById,
@@ -76,6 +77,38 @@ export async function deleteRecipeAction(
       await notifyRecipeChange({ action: "deleted", recipe, actor: user });
     }
     return { ok: true, data: undefined };
+  } catch {
+    return { ok: false, error: "レシピの削除に失敗しました" };
+  }
+}
+
+export async function bulkDeleteRecipesAction(
+  ids: string[],
+): Promise<ActionResult<{ deleted: number }>> {
+  const user = await requireUser();
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (uniqueIds.length === 0) {
+    return { ok: false, error: "レシピを選択してください" };
+  }
+
+  try {
+    const recipes = (
+      await Promise.all(uniqueIds.map((id) => getRecipeById(id)))
+    ).filter((recipe): recipe is Recipe => recipe !== null && !recipe.deletedAt);
+
+    if (recipes.length === 0) {
+      return { ok: false, error: "削除できるレシピがありません" };
+    }
+
+    await softDeleteRecipes(recipes.map((r) => r.id));
+    revalidatePath("/");
+    revalidatePath("/trash");
+
+    for (const recipe of recipes) {
+      await notifyRecipeChange({ action: "deleted", recipe, actor: user });
+    }
+
+    return { ok: true, data: { deleted: recipes.length } };
   } catch {
     return { ok: false, error: "レシピの削除に失敗しました" };
   }

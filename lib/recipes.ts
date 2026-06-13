@@ -295,6 +295,17 @@ export async function softDeleteRecipe(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function softDeleteRecipes(ids: string[]): Promise<void> {
+  if (ids.length === 0) return;
+  const supabase = createServerSupabaseClient();
+  const { error } = await supabase
+    .from("recipes")
+    .update({ deleted_at: new Date().toISOString() })
+    .in("id", ids)
+    .is("deleted_at", null);
+  if (error) throw error;
+}
+
 export async function restoreRecipe(id: string): Promise<void> {
   const supabase = createServerSupabaseClient();
   const { error } = await supabase

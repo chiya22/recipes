@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { href: "/admin/users", label: "ユーザー" },
   { href: "/admin/tags", label: "タグ" },
+  { href: "/admin/import", label: "CSV取込" },
 ];
 
 export function AdminNav() {
