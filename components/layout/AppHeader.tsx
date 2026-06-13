@@ -1,17 +1,14 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import { SearchBar } from "@/components/layout/SearchBar";
 import type { User } from "@/types";
 
 type AppHeaderProps = {
   user: User;
   /** 現在地（リンク強調用） */
   active?: "home" | "trash" | "admin";
-  /** 検索バーの初期値（ホームのみ表示） */
-  searchQuery?: string;
 };
 
-export function AppHeader({ user, active, searchQuery }: AppHeaderProps) {
+export function AppHeader({ user, active }: AppHeaderProps) {
   return (
     <header
       className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-surface px-3 sm:gap-4 sm:px-4"
@@ -24,9 +21,7 @@ export function AppHeader({ user, active, searchQuery }: AppHeaderProps) {
         レシピ
       </Link>
 
-      <div className="ml-1 flex-1 sm:ml-2">
-        {active === "home" && <SearchBar initialQuery={searchQuery} />}
-      </div>
+      <div className="flex-1" />
 
       <nav className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1">
         <Link

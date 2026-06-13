@@ -37,29 +37,10 @@ export function SidebarContent({
   selected,
   onNavigate,
 }: SidebarProps & { onNavigate?: () => void }) {
-  const { selectedSet, apply, toggle } = useTagFilter(selected);
+  const { selectedSet, toggle } = useTagFilter(selected);
 
   return (
     <nav className="flex flex-col gap-0.5">
-      <button
-        type="button"
-        onClick={() => {
-          apply([]);
-          onNavigate?.();
-        }}
-        className={`flex items-center justify-between rounded-r-full px-4 py-2 text-left text-sm transition-colors hover:bg-black/5 ${
-          selected.length === 0
-            ? "bg-accent/10 font-medium text-foreground"
-            : "text-muted"
-        }`}
-      >
-        すべてのレシピ
-      </button>
-
-      {tags.length > 0 && (
-        <p className="mt-3 px-4 pb-1 text-xs font-medium text-muted">タグ</p>
-      )}
-
       {tags.map((tag) => {
         const active = selectedSet.has(tag.id);
         return (
@@ -71,7 +52,7 @@ export function SidebarContent({
               onNavigate?.();
             }}
             aria-pressed={active}
-            className={`flex items-center justify-between gap-2 rounded-r-full px-4 py-2 text-left text-sm transition-colors hover:bg-black/5 ${
+            className={`flex cursor-pointer items-center justify-between gap-2 rounded-r-full px-4 py-2 text-left text-sm transition-colors hover:bg-black/5 ${
               active ? "bg-accent/10 font-medium text-foreground" : "text-muted"
             }`}
           >
@@ -93,7 +74,7 @@ export function SidebarContent({
  */
 export function Sidebar({ tags, selected }: SidebarProps) {
   return (
-    <aside className="hidden w-60 shrink-0 md:block">
+    <aside className="hidden w-60 shrink-0 pt-16 md:block">
       <div className="sticky top-[calc(var(--header-height)+1.5rem)]">
         <SidebarContent tags={tags} selected={selected} />
       </div>

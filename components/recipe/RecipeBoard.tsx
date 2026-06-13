@@ -23,7 +23,7 @@ export function RecipeBoard({
   return (
     <div>
       <div className="flex justify-center">
-        <InlineCreateForm availableTags={availableTags} />
+        <InlineCreateForm availableTags={availableTags} searchQuery={query} />
       </div>
 
       {recipes.length === 0 ? (
@@ -32,7 +32,7 @@ export function RecipeBoard({
             ? `「${query}」に一致するレシピはありません。`
             : filtered
               ? "選択したタグをすべて持つレシピはありません。"
-              : "レシピがまだありません。「レシピを追加...」から作成しましょう。"}
+              : "レシピがまだありません。「+新規作成」から作成しましょう。"}
         </p>
       ) : (
         <Masonry>

@@ -8,7 +8,13 @@ import { Spinner } from "@/components/ui/Spinner";
  * ホームのレシピ全文検索バー。
  * 入力をデバウンスして URL の ?q= を更新する。?tags= は維持する。
  */
-export function SearchBar({ initialQuery = "" }: { initialQuery?: string }) {
+export function SearchBar({
+  initialQuery = "",
+  className,
+}: {
+  initialQuery?: string;
+  className?: string;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [value, setValue] = useState(initialQuery);
@@ -46,7 +52,12 @@ export function SearchBar({ initialQuery = "" }: { initialQuery?: string }) {
   }, [value, router, searchParams]);
 
   return (
-    <div className="flex h-10 max-w-xl items-center gap-2 rounded-lg bg-background px-3 text-sm transition-colors focus-within:bg-background-focus">
+    <div
+      className={[
+        "flex h-10 w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 text-sm transition-colors focus-within:bg-background-focus",
+        className ?? "",
+      ].join(" ")}
+    >
       <svg
         aria-hidden
         viewBox="0 0 24 24"

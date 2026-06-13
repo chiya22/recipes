@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { SearchBar } from "@/components/layout/SearchBar";
 import {
   RecipeForm,
   initialValues,
@@ -14,8 +15,10 @@ import type { TagWithCount } from "@/types";
 
 export function InlineCreateForm({
   availableTags,
+  searchQuery = "",
 }: {
   availableTags?: TagWithCount[];
+  searchQuery?: string;
 }) {
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
@@ -40,7 +43,6 @@ export function InlineCreateForm({
         return;
       }
 
-      // 作成後に保留中の画像をアップロード
       for (const file of pendingFiles) {
         const fd = new FormData();
         fd.append("file", file);
@@ -56,38 +58,41 @@ export function InlineCreateForm({
     });
   }
 
-  if (!expanded) {
+  if (expanded) {
     return (
-      <button
-        type="button"
-        onClick={() => setExpanded(true)}
-        className="mb-6 flex h-12 w-full max-w-xl items-center rounded-xl border border-border bg-surface px-4 text-sm text-muted shadow-sm transition-shadow hover:shadow-md"
-      >
-        レシピを追加...
-      </button>
+      <div className="mb-6 w-full max-w-xl">
+        <RecipeForm
+          values={values}
+          onChange={setValues}
+          onSubmit={handleSubmit}
+          onCancel={reset}
+          pending={pending}
+          error={error}
+          submitLabel="追加"
+          autoFocus
+          availableTags={availableTags}
+          images={{
+            recipeId: null,
+            existing: [],
+            onExistingChange: () => {},
+            pendingFiles,
+            onPendingFilesChange: setPendingFiles,
+          }}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="mb-6 w-full max-w-xl">
-      <RecipeForm
-        values={values}
-        onChange={setValues}
-        onSubmit={handleSubmit}
-        onCancel={reset}
-        pending={pending}
-        error={error}
-        submitLabel="追加"
-        autoFocus
-        availableTags={availableTags}
-        images={{
-          recipeId: null,
-          existing: [],
-          onExistingChange: () => {},
-          pendingFiles,
-          onPendingFilesChange: setPendingFiles,
-        }}
-      />
+    <div className="mb-6 flex w-full max-w-xl items-center gap-2">
+      <SearchBar initialQuery={searchQuery} className="min-w-0 flex-1" />
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className="h-10 shrink-0 cursor-pointer rounded-lg bg-accent px-4 text-sm font-medium text-white hover:opacity-90"
+      >
+        +新規作成
+      </button>
     </div>
   );
 }
