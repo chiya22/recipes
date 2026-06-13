@@ -2,7 +2,7 @@ import "server-only";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Tag, TagWithCount } from "@/types";
 
-/** タグ一覧を使用回数付きで返す（使用回数の多い順、同数は名前順）。 */
+/** タグ一覧を使用回数付きで返す（名前の昇順）。 */
 export async function listTagsWithCount(): Promise<TagWithCount[]> {
   const supabase = createServerSupabaseClient();
 
@@ -27,7 +27,7 @@ export async function listTagsWithCount(): Promise<TagWithCount[]> {
       name: t.name,
       count: countByTag.get(t.id) ?? 0,
     }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "ja"));
+    .sort((a, b) => a.name.localeCompare(b.name, "ja"));
 }
 
 /** タグ名の一覧（候補サジェスト用）。 */

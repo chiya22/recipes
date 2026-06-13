@@ -91,7 +91,7 @@ export function InlineCreateForm({
         onClick={() => setExpanded(true)}
         className="h-10 shrink-0 cursor-pointer rounded-lg bg-accent px-4 text-sm font-medium text-white hover:opacity-90"
       >
-        +新規作成
+        レシピ追加
       </button>
     </div>
   );
