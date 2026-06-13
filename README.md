@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# レシピ
 
-## Getting Started
+Google Keep 風 UI のレシピ管理アプリ。Next.js 16 + React 19 + Tailwind CSS 4 +
+Supabase（DB / Storage）で構築。認証は Supabase Auth を使わないカスタム実装。
 
-First, run the development server:
+## 主な機能
+
+- レシピの作成・編集・削除（ゴミ箱 / 復元 / 完全削除）
+- タグ付け・タグ管理（使用回数順サイドバー、AND 絞り込み、統合）
+- 日本語全文検索（PGroonga）
+- 複数画像アップロード（Supabase Storage、署名付き URL）
+- レシピ変更時の admin 向けメール通知（Resend）
+- ユーザー / タグ管理画面（admin のみ）
+- レスポンシブ UI（モバイルはタグ絞り込みドロワー）
+
+## 技術スタック
+
+| 領域 | 採用技術 |
+|------|----------|
+| フレームワーク | Next.js 16（App Router / Server Actions） |
+| UI | React 19 / Tailwind CSS 4 |
+| DB / Storage | Supabase（PostgreSQL + Storage） |
+| 認証 | カスタム（JWT: `jose` / パスワード: `bcryptjs` / HttpOnly Cookie） |
+| 全文検索 | PGroonga |
+| メール | Resend |
+
+## セットアップ
+
+詳細は [`Docs/SETUP.md`](Docs/SETUP.md) を参照。
 
 ```bash
+npm install
+cp .env.example .env.local   # 値を記入
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 でアクセス。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## スクリプト
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| コマンド | 説明 |
+|----------|------|
+| `npm run dev` | 開発サーバー |
+| `npm run build` | 本番ビルド |
+| `npm run start` | 本番サーバー（要 build） |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | 型チェック（`tsc --noEmit`） |
 
-## Learn More
+## ドキュメント
 
-To learn more about Next.js, take a look at the following resources:
+- [`Docs/SETUP.md`](Docs/SETUP.md) — 環境構築
+- [`Docs/ARCHITECTURE.md`](Docs/ARCHITECTURE.md) — 設計
+- [`Docs/DATABASE.md`](Docs/DATABASE.md) — DB スキーマ
+- [`Docs/API.md`](Docs/API.md) — API / Server Actions
+- [`Docs/UI.md`](Docs/UI.md) — UI 設計
+- [`Docs/DEPLOY.md`](Docs/DEPLOY.md) — デプロイ手順
+- [`Docs/PROGRESS.md`](Docs/PROGRESS.md) — 開発進捗
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## デプロイ
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vercel を想定。手順とチェックリストは [`Docs/DEPLOY.md`](Docs/DEPLOY.md) を参照。

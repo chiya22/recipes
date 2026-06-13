@@ -26,11 +26,14 @@ npm install
    - anon public key
    - service_role key（サーバー側のみ使用）
 
-3. **Database → Extensions** で `pg_bigm` を有効化
+3. **Database → Extensions** で `pgroonga` を有効化（日本語全文検索用。`pg_bigm` は当環境で利用不可のため PGroonga を採用）
 
 4. **Storage** で `recipe-images` バケットを作成（private）
 
-5. SQL Editor で `Docs/DATABASE.md` のマイグレーションを実行
+5. マイグレーションを適用（`supabase/migrations/*.sql` の順）:
+   - 方法A: Supabase CLI（`supabase db push`）
+   - 方法B: SQL Editor で各ファイルを順に実行
+   - 含まれるもの: `users` / `recipes`・`tags`・`recipe_tags`・`recipe_images`（+ PGroonga インデックス）/ Storage バケット / 全文検索 RPC `search_recipe_ids`
 
 ## 3. Resend
 
@@ -61,7 +64,13 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## 5. 初期 admin ユーザー
 
-Supabase SQL Editor で実行（パスワードは bcrypt ハッシュに置換）:
+パスワードの bcrypt ハッシュを生成:
+
+```bash
+node scripts/hash-password.mjs "your-password"
+```
+
+Supabase SQL Editor で実行（出力されたハッシュに置換）:
 
 ```sql
 INSERT INTO users (login_id, name, role, password_hash, email)
@@ -69,10 +78,12 @@ VALUES (
   'admin',
   '管理者',
   'admin',
-  '$2b$10$...',  -- bcrypt hash of your password
-  'admin@example.com'
+  '$2b$10$...',  -- 上で生成した bcrypt ハッシュ
+  'admin@example.com'  -- 通知を受け取るには email 必須
 );
 ```
+
+> admin の email を設定しないとレシピ変更通知メールは届きません（送信対象は email 設定済みの admin のみ）。
 
 ## 6. 開発サーバー起動
 
@@ -86,22 +97,14 @@ http://localhost:3000 でアクセス。
 
 ## デプロイ（Vercel）
 
-1. GitHub リポジトリを Vercel に接続
-2. 環境変数を Vercel ダッシュボードに設定（`.env.local` と同内容）
-3. `NEXT_PUBLIC_APP_URL` を本番 URL に変更
-4. デプロイ
+詳細な手順とチェックリストは `Docs/DEPLOY.md` を参照。
 
 ---
 
-## 依存パッケージ（追加予定）
+## 依存パッケージ
 
-```bash
-npm install @supabase/supabase-js bcryptjs resend
-npm install -D @types/bcryptjs
-```
+すべて `package.json` に定義済み（`npm install` で導入）:
 
-Masonry Layout:
-
-```bash
-npm install react-masonry-css
-```
+- ランタイム: `@supabase/supabase-js` / `bcryptjs` / `jose` / `resend` / `server-only` / `next` / `react`
+- Masonry は CSS multi-column による自前実装のため追加ライブラリ不要
+- `bcryptjs` は型定義を同梱するため `@types/bcryptjs` は不要

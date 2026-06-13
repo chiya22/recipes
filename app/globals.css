@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
+/*
+ * Google Keep ライトモード風テーマ。
+ * カラーパレットは Docs/UI.md を参照。
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f9fa;
+  --surface: #ffffff;
+  --foreground: #202124;
+  --muted: #5f6368;
+  --border: #dadce0;
+  --accent: #1a73e8;
+  --header-height: 64px;
+  --background-focus: #e8eaed;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-background-focus: var(--background-focus);
+  --font-sans:
+    "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", Meiryo,
+    system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* デフォルトより一段階小さいタイポグラフィ（本文 14px → 12px 相当） */
+  --text-xs: 0.6875rem;
+  --text-xs--line-height: calc(1 / 0.6875);
+  --text-sm: 0.75rem;
+  --text-sm--line-height: calc(1 / 0.75);
+  --text-base: 0.875rem;
+  --text-base--line-height: calc(1.25 / 0.875);
+  --text-lg: 1rem;
+  --text-lg--line-height: calc(1.5 / 1);
+  --text-xl: 1.125rem;
+  --text-xl--line-height: calc(1.75 / 1.125);
+  --text-2xl: 1.25rem;
+  --text-2xl--line-height: calc(1.75 / 1.25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  height: 100%;
 }
 
 body {
+  min-height: 100%;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ボタン・リンク等のフォーカス（入力欄は focus:bg-background-focus を使用） */
+:focus-visible:not(input):not(textarea):not(select) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
