@@ -3,17 +3,26 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Tag, TagWithCount } from "@/types";
 
 /** タグ一覧を使用回数付きで返す（名前の昇順）。 */
-export async function listTagsWithCount(): Promise<TagWithCount[]> {
+export async function listTagsWithCount(options?: {
+  /** true のときゴミ箱外のレシピに付いたタグのみ（件数 0 のタグは除外） */
+  activeRecipesOnly?: boolean;
+}): Promise<TagWithCount[]> {
   const supabase = createServerSupabaseClient();
+  const activeRecipesOnly = options?.activeRecipesOnly ?? false;
 
   const { data: tags, error } = await supabase
     .from("tags")
     .select("id, name");
   if (error) throw error;
 
-  const { data: links, error: linkErr } = await supabase
-    .from("recipe_tags")
-    .select("tag_id");
+  const linksQuery = activeRecipesOnly
+    ? supabase
+        .from("recipe_tags")
+        .select("tag_id, recipes!inner(deleted_at)")
+        .is("recipes.deleted_at", null)
+    : supabase.from("recipe_tags").select("tag_id");
+
+  const { data: links, error: linkErr } = await linksQuery;
   if (linkErr) throw linkErr;
 
   const countByTag = new Map<string, number>();
@@ -27,6 +36,7 @@ export async function listTagsWithCount(): Promise<TagWithCount[]> {
       name: t.name,
       count: countByTag.get(t.id) ?? 0,
     }))
+    .filter((t) => !activeRecipesOnly || t.count > 0)
     .sort((a, b) => a.name.localeCompare(b.name, "ja"));
 }
 

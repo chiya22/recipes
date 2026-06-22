@@ -26,7 +26,7 @@ export default async function Home({
 
   const [user, tags, recipes] = await Promise.all([
     requireUser(),
-    listTagsWithCount(),
+    listTagsWithCount({ activeRecipesOnly: true }),
     listActiveRecipes({ tagIds: selectedTagIds, query }),
   ]);
 
