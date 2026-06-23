@@ -2,6 +2,7 @@
 
 import { TagPicker } from "./TagPicker";
 import { ImageUploader } from "./ImageUploader";
+import { AutoResizeTextarea } from "@/components/ui/AutoResizeTextarea";
 import type { Recipe, RecipeImage, TagWithCount } from "@/types";
 import type { RecipeInput } from "@/lib/recipes";
 
@@ -89,26 +90,26 @@ export function RecipeForm({
         className={`${fieldClass} font-medium`}
         maxLength={200}
       />
-      <textarea
+      <AutoResizeTextarea
         value={values.ingredients}
         onChange={(e) => set("ingredients", e.target.value)}
         placeholder="材料"
-        rows={3}
-        className={`${fieldClass} resize-y`}
+        minRows={3}
+        className={fieldClass}
       />
-      <textarea
+      <AutoResizeTextarea
         value={values.instructions}
         onChange={(e) => set("instructions", e.target.value)}
         placeholder="作り方"
-        rows={4}
-        className={`${fieldClass} resize-y`}
+        minRows={4}
+        className={fieldClass}
       />
-      <textarea
+      <AutoResizeTextarea
         value={values.notes}
         onChange={(e) => set("notes", e.target.value)}
         placeholder="その他（メモ）"
-        rows={2}
-        className={`${fieldClass} resize-y`}
+        minRows={2}
+        className={fieldClass}
       />
 
       <TagPicker
