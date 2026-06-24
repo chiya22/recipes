@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/body-scroll-lock";
 
 type ModalProps = {
   open: boolean;
@@ -8,6 +9,8 @@ type ModalProps = {
   children: React.ReactNode;
   labelledBy?: string;
   className?: string;
+  /** false のとき Esc で閉じない（子モーダル表示中など） */
+  closeOnEscape?: boolean;
 };
 
 /**
@@ -17,10 +20,19 @@ type ModalProps = {
  * - 開いている間は body スクロールを抑止
  * - 簡易フォーカストラップ
  */
-export function Modal({ open, onClose, children, labelledBy, className }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  children,
+  labelledBy,
+  className,
+  closeOnEscape = true,
+}: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const closeOnEscapeRef = useRef(closeOnEscape);
+  closeOnEscapeRef.current = closeOnEscape;
 
   // 開いたときだけパネルにフォーカス（onClose の再生成で入力フォーカスが外れないよう open のみ依存）
   useEffect(() => {
@@ -32,19 +44,17 @@ export function Modal({ open, onClose, children, labelledBy, className }: ModalP
     if (!open) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && closeOnEscapeRef.current) {
         e.stopPropagation();
         onCloseRef.current();
       }
     };
     document.addEventListener("keydown", onKeyDown);
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockBodyScroll();
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = prevOverflow;
+      unlockBodyScroll();
     };
   }, [open]);
 

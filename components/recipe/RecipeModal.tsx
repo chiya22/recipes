@@ -11,6 +11,7 @@ import {
   type RecipeFormValues,
 } from "./RecipeForm";
 import { updateRecipeAction, deleteRecipeAction } from "@/app/actions/recipes";
+import { RecipePrintModal } from "./RecipePrintModal";
 import type { Recipe, RecipeImage, TagWithCount } from "@/types";
 
 type RecipeModalProps = {
@@ -36,6 +37,7 @@ export function RecipeModal({
   );
   const [error, setError] = useState<string | null>(null);
   const [discardPrompt, setDiscardPrompt] = useState(false);
+  const [showPrint, setShowPrint] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const valuesRef = useRef(values);
@@ -46,13 +48,17 @@ export function RecipeModal({
   discardPromptRef.current = discardPrompt;
 
   useEffect(() => {
-    if (!recipe) return;
+    if (!recipe) {
+      setShowPrint(false);
+      return;
+    }
     const initial = initialValues(recipe);
     setValues(initial);
     setBaseline(initial);
     setEditImages(recipe.images);
     setError(null);
     setDiscardPrompt(false);
+    setShowPrint(false);
   }, [recipe?.id]);
 
   const requestClose = useCallback(() => {
@@ -78,11 +84,10 @@ export function RecipeModal({
     onClose();
   }, [onClose]);
 
-  if (!recipe) return null;
-
   const r = recipe;
 
   function handleSave() {
+    if (!r) return;
     setDiscardPrompt(false);
     setError(null);
     startTransition(async () => {
@@ -97,6 +102,7 @@ export function RecipeModal({
   }
 
   function handleDelete() {
+    if (!r) return;
     if (!confirm("このレシピをゴミ箱に移動しますか？")) return;
     startTransition(async () => {
       const result = await deleteRecipeAction(r.id);
@@ -110,7 +116,14 @@ export function RecipeModal({
   }
 
   return (
-    <Modal open={!!recipe} onClose={requestClose} labelledBy="recipe-modal-title">
+    <>
+    <Modal
+      open={!!recipe}
+      onClose={requestClose}
+      closeOnEscape={!showPrint}
+      labelledBy="recipe-modal-title"
+    >
+      {r && (
       <div className="p-4">
         <h2 id="recipe-modal-title" className="sr-only">
           {r.title} を編集
@@ -162,7 +175,7 @@ export function RecipeModal({
             onPendingFilesChange: () => {},
           }}
         />
-        <div className="mt-2 flex justify-start">
+        <div className="mt-2 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={handleDelete}
@@ -171,8 +184,31 @@ export function RecipeModal({
           >
             ゴミ箱に移動
           </button>
+          <button
+            type="button"
+            onClick={() => setShowPrint(true)}
+            disabled={pending}
+            className="h-9 rounded-lg border border-border px-3 text-sm text-foreground hover:bg-black/5 disabled:opacity-60"
+          >
+            印刷
+          </button>
         </div>
       </div>
+      )}
     </Modal>
+
+    <RecipePrintModal
+      open={!!recipe && showPrint}
+      onClose={() => setShowPrint(false)}
+      content={{
+        title: values.title,
+        ingredients: values.ingredients,
+        instructions: values.instructions,
+        notes: values.notes,
+        tagNames: values.tagNames,
+        images: editImages,
+      }}
+    />
+    </>
   );
 }
