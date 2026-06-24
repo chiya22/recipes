@@ -19,6 +19,14 @@ type ModalProps = {
  */
 export function Modal({ open, onClose, children, labelledBy, className }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  // 開いたときだけパネルにフォーカス（onClose の再生成で入力フォーカスが外れないよう open のみ依存）
+  useEffect(() => {
+    if (!open) return;
+    panelRef.current?.focus();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -26,7 +34,7 @@ export function Modal({ open, onClose, children, labelledBy, className }: ModalP
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
-        onClose();
+        onCloseRef.current();
       }
     };
     document.addEventListener("keydown", onKeyDown);
@@ -34,14 +42,11 @@ export function Modal({ open, onClose, children, labelledBy, className }: ModalP
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // 初期フォーカス
-    panelRef.current?.focus();
-
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -49,7 +54,7 @@ export function Modal({ open, onClose, children, labelledBy, className }: ModalP
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-8"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) onCloseRef.current();
       }}
     >
       <div

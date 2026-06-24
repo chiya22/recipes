@@ -54,6 +54,27 @@ export function toRecipeInput(v: RecipeFormValues): RecipeInput {
   };
 }
 
+function sameTagNames(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((name, i) => name === sortedB[i]);
+}
+
+/** フォーム値が baseline と異なる（未保存の変更がある）か。 */
+export function isRecipeFormDirty(
+  values: RecipeFormValues,
+  baseline: RecipeFormValues,
+): boolean {
+  return (
+    values.title !== baseline.title ||
+    values.ingredients !== baseline.ingredients ||
+    values.instructions !== baseline.instructions ||
+    values.notes !== baseline.notes ||
+    !sameTagNames(values.tagNames, baseline.tagNames)
+  );
+}
+
 const fieldClass =
   "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:bg-background-focus";
 
