@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import type { User } from "@/types";
@@ -14,11 +15,15 @@ export function AppHeader({ user, active }: AppHeaderProps) {
       className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-surface px-3 sm:gap-4 sm:px-4"
       style={{ height: "var(--header-height)" }}
     >
-      <Link
-        href="/"
-        className="shrink-0 text-xl font-medium text-foreground"
-      >
-        レシピ
+      <Link href="/" className="shrink-0 bg-white" aria-label="無垢食堂 ホーム">
+        <Image
+          src="/logo.png"
+          alt="無垢食堂"
+          width={100}
+          height={32}
+          className="h-9 bg-white"
+          priority
+        />
       </Link>
 
       <div className="flex-1" />
